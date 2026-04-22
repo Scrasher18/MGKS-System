@@ -12,8 +12,8 @@ public class UsuarioService {
 
     public UsuarioService() {
         
-        usuarios.add(new Usuario("12345678", "Luis Perez", "luis@mgks.pe"));
-        usuarios.add(new Usuario("87654321", "Admin MGKS", "admin@mgks.pe"));
+        usuarios.add(new Usuario("12345678", "Luis Perez", "luis@mgks.pe","Trabajador"));
+        usuarios.add(new Usuario("87654321", "Admin MGKS", "admin@mgks.pe","Administrador"));
     }
 
     public List<Usuario> listarTodo() {
