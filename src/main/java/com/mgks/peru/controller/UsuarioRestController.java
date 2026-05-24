@@ -4,40 +4,54 @@ import com.mgks.peru.model.Usuario;
 import com.mgks.peru.service.UsuarioService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/usuarios") 
 public class UsuarioRestController {
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioService trabajadorService;
 
     @GetMapping
     public List<Usuario> getAll() {
-       
-        return usuarioService.listarTodo();
+        return trabajadorService.listarTodo();
     }
-    @PostMapping
-    public String save(@RequestBody Usuario nuevoUsuario) {
-        usuarioService.guardar(nuevoUsuario);
-        return "Usuario con DNI " + nuevoUsuario.getDni() + " guardado con éxito";
+    
+    @GetMapping("/{dni}")
+    public ResponseEntity<Usuario> getById(@PathVariable String dni) {
+        Usuario trabajador = trabajadorService.buscarPorDni(dni);
+        if (trabajador != null) {
+            return ResponseEntity.ok(trabajador);
+        }
+        return ResponseEntity.notFound().build();
     }
 
+    @PostMapping
+    public String save(@RequestBody Usuario nuevoTrabajador) {
+        trabajadorService.guardar(nuevoTrabajador);
+        return "Trabajador con DNI " + nuevoTrabajador.getDni() + " guardado con éxito";
+    }
+
+  
+    @PutMapping("/{dni}")
+    public ResponseEntity<String> update(@PathVariable String dni, @RequestBody Usuario datosNuevos) {
+        try {
+            trabajadorService.actualizar(dni, datosNuevos);
+            return ResponseEntity.ok("¡Datos actualizados con éxito en el sistema MGKS!");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al actualizar: " + e.getMessage());
+        }
+    }
+   
     @DeleteMapping("/{dni}")
     public String delete(@PathVariable String dni) {
-        boolean eliminado = usuarioService.eliminar(dni);
-        
+        boolean eliminado = trabajadorService.eliminar(dni);
         if (eliminado) {
-            return "Usuario con DNI " + dni + " eliminado";
+            return "Trabajador con DNI " + dni + " eliminado con éxito";
         } else {
-            return "Error: No se encontró usuario con el DNI " + dni;
+            return "Error: No se encontró trabajador con el DNI " + dni;
         }
     }
 }

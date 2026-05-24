@@ -1,30 +1,73 @@
 package com.mgks.peru.service;
 
 import com.mgks.peru.model.Usuario;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import java.util.List;
+import com.mgks.peru.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
-    
-    private List<Usuario> usuarios = new ArrayList<>();
 
-    public UsuarioService() {
-        
-        usuarios.add(new Usuario("12345678", "Luis Perez", "luis@mgks.pe","Trabajador"));
-        usuarios.add(new Usuario("87654321", "Admin MGKS", "admin@mgks.pe","Administrador"));
-    }
+    @Autowired
+    private UsuarioRepository trabajadorRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<Usuario> listarTodo() {
-        return usuarios;
+        return trabajadorRepository.findAll();
     }
 
-    public void guardar(Usuario usuario) {
-        usuarios.add(usuario);
+    public void guardar(Usuario trabajador) {
+        trabajador.setPassword(passwordEncoder.encode(trabajador.getPassword()));
+        trabajadorRepository.save(trabajador);
+    }
+
+ 
+    public void actualizar(String dni, Usuario datosNuevos) {
+        Usuario usuarioExistente = trabajadorRepository.findById(dni)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Trabajador no encontrado con DNI: " + dni));
+
+       
+        usuarioExistente.setNombre(datosNuevos.getNombre());
+        usuarioExistente.setApellidos(datosNuevos.getApellidos());
+        usuarioExistente.setTelefono(datosNuevos.getTelefono());
+        usuarioExistente.setSueldoBase(datosNuevos.getSueldoBase());
+        usuarioExistente.setBanco(datosNuevos.getBanco());
+        usuarioExistente.setNumeroCuenta(datosNuevos.getNumeroCuenta());
+        
+      
+        if (datosNuevos.getPassword() != null && !datosNuevos.getPassword().trim().isEmpty() && !datosNuevos.getPassword().equals("••••••••")) {
+            usuarioExistente.setPassword(passwordEncoder.encode(datosNuevos.getPassword()));
+        }
+
+        trabajadorRepository.save(usuarioExistente);
     }
 
     public boolean eliminar(String dni) {
-        return usuarios.removeIf(u -> u.getDni().equals(dni));
+        Usuario usuario = trabajadorRepository.findById(dni).orElse(null);
+
+        if (usuario == null) {
+            return false;
+        }
+
+      
+        if ("SUPERADMINISTRADOR".equals(usuario.getRol())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Acción denegada: El Super Administrador es intocable en el sistema MGKS."
+            );
+        }
+
+        trabajadorRepository.deleteById(dni);
+        return true;
+    }
+
+    public Usuario buscarPorDni(String dni) {
+        return trabajadorRepository.findById(dni).orElse(null);
     }
 }
