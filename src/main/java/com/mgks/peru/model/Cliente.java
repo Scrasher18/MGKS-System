@@ -23,7 +23,7 @@ public class Cliente {
     @JsonIgnoreProperties("cliente")
     private List<Sucursal> sucursales;
 
-    // --- Getters y Setters ---
+    
     public Long getId() {
         return id;
     }

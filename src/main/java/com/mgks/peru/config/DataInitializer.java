@@ -19,9 +19,7 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initDatabase(UsuarioRepository repository, PasswordEncoder encoder) {
         return args -> {
-            System.out.println("=================================================");
-            System.out.println("️ MGKS: Iniciando inicialización de usuarios de prueba...");
-            System.out.println("=================================================");
+         
 
             String defaultPasswordEncrypted = encoder.encode("123");
 
@@ -84,9 +82,7 @@ public class DataInitializer {
                 System.out.println("Operario de Lavado (22222222) creado.");
             }
 
-            System.out.println("=================================================");
-            System.out.println("MGKS: ¡Base de datos sincronizada con los 3 niveles!");
-            System.out.println("=================================================");
+            
         };
     }
 }

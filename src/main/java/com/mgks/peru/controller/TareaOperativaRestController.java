@@ -29,11 +29,10 @@ public class TareaOperativaRestController {
 
     @PutMapping("/{id}/resolver")
     public ResponseEntity<TareaOperativa> resolver(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @RequestParam String estado) {
         return ResponseEntity.ok(tareaOperativaService.resolverTarea(id, estado));
     }
-
 
     @GetMapping("/trabajador/{dni}")
     public List<TareaOperativa> listarPorTrabajador(@PathVariable String dni) {
@@ -45,5 +44,10 @@ public class TareaOperativaRestController {
             @PathVariable Long id,
             @RequestBody EvidenciaRequest request) {
         return ResponseEntity.ok(tareaOperativaService.subirEvidencia(id, request.getUrl(), request.getObs()));
+    }
+
+    @GetMapping("/all")
+    public List<TareaOperativa> listarTodo() {
+        return tareaOperativaService.findAll();
     }
 }
